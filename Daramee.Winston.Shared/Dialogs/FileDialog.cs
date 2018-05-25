@@ -84,7 +84,14 @@ namespace Daramee.Winston.Dialogs
 			else if ( !option.HasFlag ( FileOpenDialogOptions.PickFolders ) )
 				fileDialog.SetFileTypes ( 0, new CommonDialogFilterSpecification [ 0 ] );
 			fileDialog.SetFileName ( FileName ?? "" );
-
+			if ( !string.IsNullOrEmpty ( InitialDirectory ) )
+			{
+				SHCreateItemFromParsingName ( InitialDirectory, IntPtr.Zero,
+				new Guid ( "43826D1E-E718-42EE-BC55-A1E261C37BFE" ),
+				out IShellItem initialDirectory );
+				fileDialog.SetFolder ( initialDirectory );
+				Marshal.ReleaseComObject ( initialDirectory );
+			}
 			int result = fileDialog.Show ( parent );
 			if ( result == HResultFromWin32 ( 1223 ) )
 			{

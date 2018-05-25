@@ -9,7 +9,7 @@ namespace Daramee.Winston
 	{
 		public static bool IsAvailablePlatform ()
 		{
-#if NET45
+#if NET40 || NET45 || NET46 || NET47 || WPF
 			if ( Environment.OSVersion.Platform == PlatformID.Win32NT
 				&& Environment.OSVersion.Version >= new Version ( 6, 0 ) )
 				return true;
