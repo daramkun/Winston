@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\OpenFileDialog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\OpenFolderDialog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\SaveFileDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)File\FilesEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)File\Operation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\TaskDialog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utility.cs" />
