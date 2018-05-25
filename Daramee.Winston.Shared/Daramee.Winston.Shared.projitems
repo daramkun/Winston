@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>07d3172f-ff1f-4e6f-aebe-3e725904b2a7</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Daramee.Winston</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\FileDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\OpenFileDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\OpenFolderDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\SaveFileDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)File\Operation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\TaskDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WinstonInterop.cs" />
+  </ItemGroup>
+</Project>
