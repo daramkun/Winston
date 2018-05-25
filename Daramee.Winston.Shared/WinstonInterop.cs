@@ -154,7 +154,7 @@ namespace Daramee.Winston
 			void GetAnyOperationsAborted ( [MarshalAs ( UnmanagedType.Bool )] ref bool pfAnyOperationsAborted );
 		}
 
-
+#if !NOTASKDIALOG
 		public enum TaskDialogNotification : uint
 		{
 			Created = 0,
@@ -321,6 +321,7 @@ namespace Daramee.Winston
 				LoadTaskDialog ();
 			return taskDialogIndirectAction ( ref taskConfig, out button, out radioButton, out verificationFlagChecked );
 		}
+#endif
 
 		[ComImport]
 		[Guid ( "b4db1657-70d7-485e-8e3e-6fcb5a5c1802" )]
