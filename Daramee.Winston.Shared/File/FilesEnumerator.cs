@@ -10,9 +10,15 @@ namespace Daramee.Winston.File
     {
 		public static IEnumerable<string> EnumerateFiles ( string path, string pattern, bool topDirectoryOnly = true )
 		{
+			bool allFinding = false;
 			IntPtr hFind = FindFirstFile ( Path.Combine ( path, pattern ), out WIN32_FIND_DATA findData );
 			if ( hFind == new IntPtr ( -1 ) )
-				yield break;
+			{
+				hFind = FindFirstFile ( Path.Combine ( path, "*" ), out findData );
+				if ( hFind == new IntPtr ( -1 ) )
+					yield break;
+				allFinding = true;
+			}
 
 			do
 			{
@@ -25,7 +31,12 @@ namespace Daramee.Winston.File
 					foreach ( var innerfile in EnumerateFiles ( Path.Combine ( path, findData.cFileName ), pattern, false ) )
 						yield return innerfile;
 				}
-				yield return Path.Combine ( path, findData.cFileName );
+				string ret = Path.Combine ( path, findData.cFileName );
+				if ( ret != path )
+				{
+					if ( ( allFinding && PathMatchSpec ( ret, pattern ) ) || !allFinding )
+						yield return ret;
+				}
 			} while ( FindNextFile ( hFind, out findData ) );
 
 			FindClose ( hFind );

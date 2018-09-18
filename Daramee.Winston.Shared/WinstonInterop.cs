@@ -597,5 +597,7 @@ namespace Daramee.Winston
 		public static extern bool FindNextFile ( IntPtr hFindFile, out WIN32_FIND_DATA lpFindFileData );
 		[DllImport ( "Kernel32", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode )]
 		public static extern bool FindClose ( IntPtr hFindFile );
+		[DllImport ( "Shlwapi", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode )]
+		static extern bool PathMatchSpec ( string pszFile, string pszSpec );
 	}
 }
