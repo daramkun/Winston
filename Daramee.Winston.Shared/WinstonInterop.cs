@@ -598,6 +598,6 @@ namespace Daramee.Winston
 		[DllImport ( "Kernel32", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode )]
 		public static extern bool FindClose ( IntPtr hFindFile );
 		[DllImport ( "Shlwapi", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode )]
-		static extern bool PathMatchSpec ( string pszFile, string pszSpec );
+		public static extern bool PathMatchSpec ( string pszFile, string pszSpec );
 	}
 }
