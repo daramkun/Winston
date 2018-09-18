@@ -136,7 +136,7 @@ namespace Daramee.Winston.Dialogs
 			{
 				string [] items = Filter.Split ( '|' );
 				CommonDialogFilterSpecification [] specs = new CommonDialogFilterSpecification [ items.Length / 2 ];
-				for ( int i = 0; i < specs.Length; i += 2 )
+				for ( int i = 0; i < specs.Length; ++i )
 				{
 					specs [ i ].Name = items [ i * 2 ];
 					specs [ i ].Specification = items [ i * 2 + 1 ];

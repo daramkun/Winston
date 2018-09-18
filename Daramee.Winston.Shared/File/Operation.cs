@@ -33,7 +33,17 @@ namespace Daramee.Winston.File
 			if ( fileOperation != null )
 			{
 				if ( doTransaction )
-					fileOperation.PerformOperations ();
+				{
+					try
+					{
+						fileOperation.PerformOperations ();
+					}
+					catch ( Exception ex )
+					{
+						if ( !ex.HResult.Equals ( unchecked ( ( int ) 0x8000FFFF) ) )
+							throw ex;
+					}
+				}
 				Marshal.ReleaseComObject ( fileOperation );
 				fileOperation = null;
 			}
