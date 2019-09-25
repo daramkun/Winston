@@ -55,8 +55,9 @@ namespace Daramee.Winston.File
 				== System.IO.Path.GetFullPath ( source ) )
 				return;
 
-			if ( overwrite && System.IO.File.Exists ( destination ) )
-				System.IO.File.Delete ( destination );
+			if ( !overwrite )
+				destination = GetNonOverwriteFilename ( destination );
+
 			if ( fileOperation == null )
 			{
 				System.IO.File.Move ( source, destination );
@@ -101,8 +102,8 @@ namespace Daramee.Winston.File
 			}
 			else
 			{
-				if ( overwrite && System.IO.File.Exists ( destination ) )
-					System.IO.File.Delete ( destination );
+				if ( !overwrite )
+					destination = GetNonOverwriteFilename ( destination );
 
 				IShellItem sourceItem = CreateItem ( source );
 				IShellItem destinationPathItem = CreateItem ( System.IO.Path.GetDirectoryName ( destination ) );
@@ -115,6 +116,25 @@ namespace Daramee.Winston.File
 
 				AssertHRESULT ( result );
 			}
+		}
+
+		private static string GetNonOverwriteFilename ( string filename )
+		{
+			if ( !System.IO.File.Exists ( filename ) ) return filename;
+			
+			uint count = 1;
+			string path = Path.GetDirectoryName ( filename );
+			string name = Path.GetFileNameWithoutExtension ( filename );
+			string ext = Path.GetExtension ( filename );
+
+			while ( count < 0xffffffff )
+			{
+				string newFilename = Path.Combine ( path, $"{name} ({count}){ext}" );
+				if ( !System.IO.File.Exists ( newFilename ) )
+					return newFilename;
+			}
+
+			throw new IOException ();
 		}
 
 		public static void Delete ( string filename )
