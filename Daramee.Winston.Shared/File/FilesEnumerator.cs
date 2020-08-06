@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using static Daramee.Winston.WinstonInterop;
 
 namespace Daramee.Winston.File

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using static Daramee.Winston.WinstonInterop;
 
 namespace Daramee.Winston.Dialogs
