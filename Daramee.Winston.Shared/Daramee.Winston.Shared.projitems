@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)File\FilesEnumerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)File\Operation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\TaskDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)File\StringLogicalComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WinstonInterop.cs" />
   </ItemGroup>
