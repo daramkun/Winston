@@ -3,164 +3,182 @@ using System.IO;
 using System.Runtime.InteropServices;
 using static Daramee.Winston.WinstonInterop;
 
-namespace Daramee.Winston.File
+namespace Daramee.Winston.File;
+
+public static class Operation
 {
-    public static class Operation
+    private static IFileOperation? _fileOperation;
+
+    public static bool Begin(bool undoable = true)
     {
-	    private static IFileOperation _fileOperation;
+        if (_fileOperation != null)
+            throw new InvalidOperationException();
 
-		public static bool Begin ( bool undoable = true )
-		{
-			if ( _fileOperation != null )
-				throw new InvalidOperationException ();
+        try
+        {
+            _fileOperation =
+                Activator.CreateInstance(Type.GetTypeFromCLSID(new Guid("3ad05575-8857-4850-9277-11b85bdb8e09"))) as
+                    IFileOperation;
 
-			try
-			{
-				_fileOperation = Activator.CreateInstance ( Type.GetTypeFromCLSID ( new Guid ( "3ad05575-8857-4850-9277-11b85bdb8e09" ) ) ) as IFileOperation;
-				_fileOperation?.SetOperationFlags (
-					( undoable ? OperationFlag.AllowUndo : OperationFlag.None )
-					| OperationFlag.NoUI );
-			}
-			catch { return false; }
+            _fileOperation?.SetOperationFlags(
+                (undoable ? OperationFlag.AllowUndo : OperationFlag.None)
+                | OperationFlag.NoUI);
+        }
+        catch
+        {
+            return false;
+        }
 
-			return _fileOperation != null;
-		}
+        return _fileOperation != null;
+    }
 
-		public static void End ( bool doTransaction = true )
-		{
-			if ( _fileOperation != null )
-			{
-				if ( doTransaction )
-				{
-					try
-					{
-						_fileOperation.PerformOperations ();
-					}
-					catch ( Exception ex )
-					{
-						if ( !ex.HResult.Equals ( unchecked ( ( int ) 0x8000FFFF) ) )
-							throw;
-					}
-				}
-				Marshal.ReleaseComObject ( _fileOperation );
-				_fileOperation = null;
-			}
-		}
+    public static void End(bool doTransaction = true)
+    {
+        if (_fileOperation == null)
+            return;
 
-		public static void Move ( string destination, string source, bool overwrite = true )
-		{
-			if ( Path.GetFullPath ( destination )
-				== Path.GetFullPath ( source ) )
-				return;
+        if (doTransaction)
+        {
+            try
+            {
+                _fileOperation.PerformOperations();
+            }
+            catch (Exception ex)
+            {
+                if (!ex.HResult.Equals(unchecked((int) 0x8000FFFF)))
+                    throw;
+            }
+        }
 
-			if ( !overwrite )
-				destination = GetNonOverwriteFilename ( destination );
+        Marshal.ReleaseComObject(_fileOperation);
+        _fileOperation = null;
+    }
 
-			if ( _fileOperation == null )
-			{
-				System.IO.File.Move ( source, destination );
-			}
-			else
-			{
-				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows) &&
-				    string.Equals (destination, source, StringComparison.CurrentCultureIgnoreCase))
-				{
-					System.IO.File.Move(destination + " ", source, false);
-					source = destination + " ";
-				}
+    public static void Move(string destination, string source, bool overwrite = true)
+    {
+        if (destination == null)
+            throw new ArgumentNullException(nameof(destination));
+        
+        if (Path.GetFullPath(destination) == Path.GetFullPath(source))
+            return;
 
-				var sourceItem = CreateItem ( source );
+        if (!overwrite)
+            destination = GetNonOverwriteFilename(destination);
 
-				long result;
-				if (Path.GetDirectoryName ( source )
-				     != Path.GetDirectoryName ( destination ) )
-				{
-					var destinationPathItem = CreateItem ( Path.GetDirectoryName ( destination ) );
-					
-					result = _fileOperation.MoveItem ( sourceItem, destinationPathItem,
-						Path.GetFileName ( destination ), IntPtr.Zero );
+        if (_fileOperation == null)
+        {
+            System.IO.File.Move(source, destination);
+        }
+        else
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
+                string.Equals(destination, source, StringComparison.CurrentCultureIgnoreCase))
+            {
+                System.IO.File.Move(destination + " ", source);
+                source = destination + " ";
+            }
 
-					Marshal.ReleaseComObject ( destinationPathItem );
-				}
-				else
-				{
-					result = _fileOperation.RenameItem ( sourceItem,
-						Path.GetFileName ( destination ), IntPtr.Zero );
-				}
+            var sourceItem = CreateItem(source);
 
-				Marshal.ReleaseComObject ( sourceItem );
+            long result;
+            if (Path.GetDirectoryName(source)
+                != Path.GetDirectoryName(destination))
+            {
+                var destinationPathItem = CreateItem(Path.GetDirectoryName(destination)!);
 
-				AssertHresult ( result );
-			}
-		}
+                result = _fileOperation.MoveItem(sourceItem, destinationPathItem,
+                    Path.GetFileName(destination), IntPtr.Zero);
 
-		public static void Copy ( string destination, string source, bool overwrite = true )
-		{
-			if ( Path.GetFullPath ( destination )
-				== Path.GetFullPath ( source ) )
-				return;
+                Marshal.ReleaseComObject(destinationPathItem);
+            }
+            else
+            {
+                result = _fileOperation.RenameItem(sourceItem,
+                    Path.GetFileName(destination), IntPtr.Zero);
+            }
 
-			if ( _fileOperation == null )
-			{
-				System.IO.File.Copy ( source, destination, overwrite );
-			}
-			else
-			{
-				if ( !overwrite )
-					destination = GetNonOverwriteFilename ( destination );
+            Marshal.ReleaseComObject(sourceItem);
 
-				var sourceItem = CreateItem ( source );
-				var destinationPathItem = CreateItem ( System.IO.Path.GetDirectoryName ( destination ) );
+            AssertHresult(result);
+        }
+    }
 
-				var result = _fileOperation.CopyItem ( sourceItem, destinationPathItem,
-					Path.GetFileName ( destination ), IntPtr.Zero );
+    public static void Copy(string destination, string source, bool overwrite = true)
+    {
+        if (destination == null)
+            throw new ArgumentNullException(nameof(destination));
+        
+        if (Path.GetFullPath(destination)
+            == Path.GetFullPath(source))
+            return;
 
-				Marshal.ReleaseComObject ( destinationPathItem );
-				Marshal.ReleaseComObject ( sourceItem );
+        if (_fileOperation == null)
+        {
+            System.IO.File.Copy(source, destination, overwrite);
+        }
+        else
+        {
+            if (!overwrite)
+                destination = GetNonOverwriteFilename(destination);
 
-				AssertHresult ( result );
-			}
-		}
+            var sourceItem = CreateItem(source);
+            var destinationPathItem = CreateItem(System.IO.Path.GetDirectoryName(destination)!);
 
-		private static string GetNonOverwriteFilename ( string filename )
-		{
-			if ( !System.IO.File.Exists ( filename ) ) return filename;
-			
-			const uint count = 1;
-			var path = Path.GetDirectoryName ( filename );
-			var name = Path.GetFileNameWithoutExtension ( filename );
-			var ext = Path.GetExtension ( filename );
+            var result = _fileOperation.CopyItem(sourceItem, destinationPathItem,
+                Path.GetFileName(destination), IntPtr.Zero);
 
-			while ( count < 0xffffffff )
-			{
-				var newFilename = Path.Combine ( path, $"{name} ({count}){ext}" );
-				if ( !System.IO.File.Exists ( newFilename ) )
-					return newFilename;
-			}
+            Marshal.ReleaseComObject(destinationPathItem);
+            Marshal.ReleaseComObject(sourceItem);
 
-			throw new IOException ();
-		}
+            AssertHresult(result);
+        }
+    }
 
-		public static void Delete ( string filename )
-		{
-			var fileItem = CreateItem ( filename );
-			var result = _fileOperation.DeleteItem ( fileItem, IntPtr.Zero );
-			Marshal.ReleaseComObject ( fileItem );
-			AssertHresult ( result );
-		}
+    private static string GetNonOverwriteFilename(string filename)
+    {
+        if (!System.IO.File.Exists(filename)) return filename;
 
-		private static IShellItem CreateItem ( string path )
-		{
-			SHCreateItemFromParsingName ( path, IntPtr.Zero,
-				new Guid ( "43826D1E-E718-42EE-BC55-A1E261C37BFE" ),
-				out var item );
-			return item;
-		}
+        uint count = 1;
+        var path = Path.GetDirectoryName(filename)!;
+        var name = Path.GetFileNameWithoutExtension(filename)!;
+        var ext = Path.GetExtension(filename)!;
 
-		private static void AssertHresult ( long hr )
-		{
-			if ( hr == 0 ) return;
-			throw new IOException ( "HRESULT exception.", ( int ) hr );
-		}
-	}
+        while (count < 0xfffffffe)
+        {
+            var newFilename = Path.Combine(path, $"{name} ({count++}){ext}");
+            if (!System.IO.File.Exists(newFilename))
+                return newFilename;
+        }
+
+        throw new IOException();
+    }
+
+    public static void Delete(string filename)
+    {
+        if (_fileOperation != null)
+        {
+            var fileItem = CreateItem(filename);
+            var result = _fileOperation.DeleteItem(fileItem, IntPtr.Zero);
+            Marshal.ReleaseComObject(fileItem);
+            AssertHresult(result);            
+        }
+        else
+        {
+            System.IO.File.Delete(filename);
+        }
+    }
+
+    private static IShellItem CreateItem(string path)
+    {
+        SHCreateItemFromParsingName(path, IntPtr.Zero,
+            new Guid("43826D1E-E718-42EE-BC55-A1E261C37BFE"),
+            out var item);
+        return item;
+    }
+
+    private static void AssertHresult(long hr)
+    {
+        if (hr == 0) return;
+        throw new IOException("HRESULT exception.", (int) hr);
+    }
 }
