@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Versioning;
 using static Daramee.Winston.WinstonInterop;
 
 namespace Daramee.Winston.File;
 
+[SupportedOSPlatform("windows")]
 public static class FilesEnumerator
 {
     public static IEnumerable<string> EnumerateFiles(string path, string pattern, bool topDirectoryOnly = true)

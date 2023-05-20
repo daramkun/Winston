@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using static Daramee.Winston.WinstonInterop;
 
 namespace Daramee.Winston.Dialogs;
@@ -237,6 +238,7 @@ public class VerificationClickedEventArgs : TaskDialogEventArgs
     }
 }
 
+[SupportedOSPlatform("windows")]
 public abstract class TaskDialogIcon
 {
     static IntPtr MAKEINTRESOURCE(int resId)
@@ -286,6 +288,7 @@ public class TaskDialogNativeIcon : TaskDialogIcon
     }
 }
 
+[SupportedOSPlatform("windows")]
 public class TaskDialog
 {
     internal TaskDialogConfig config = new TaskDialogConfig();

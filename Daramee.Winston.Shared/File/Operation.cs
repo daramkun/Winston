@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using static Daramee.Winston.WinstonInterop;
 
 namespace Daramee.Winston.File;
 
+[SupportedOSPlatform("windows")]
 public static class Operation
 {
     private static IFileOperation? _fileOperation;
@@ -17,8 +19,9 @@ public static class Operation
         try
         {
             _fileOperation =
-                Activator.CreateInstance(Type.GetTypeFromCLSID(new Guid("3ad05575-8857-4850-9277-11b85bdb8e09"))) as
-                    IFileOperation;
+                Activator.CreateInstance(
+                    Type.GetTypeFromCLSID(new Guid("3ad05575-8857-4850-9277-11b85bdb8e09")) ?? throw new PlatformNotSupportedException()
+                ) as IFileOperation;
 
             _fileOperation?.SetOperationFlags(
                 (undoable ? OperationFlag.AllowUndo : OperationFlag.None)

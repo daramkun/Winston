@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using static Daramee.Winston.WinstonInterop;
 
 namespace Daramee.Winston.Dialogs;
 
+[SupportedOSPlatform("windows")]
 public class OpenFileDialog : FileDialog
 {
     public bool AllowMultiSelection { get; set; }

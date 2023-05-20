@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text;
 
 namespace Daramee.Winston.File;
 
+[SupportedOSPlatform("windows")]
 public class StringLogicalComparer : IComparer<string>
 {
     private readonly int _modifier = 1;
@@ -24,5 +26,5 @@ public class StringLogicalComparer : IComparer<string>
     }
 
     [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
-    public static extern int StrCmpLogicalW(string psz1, string psz2);
+    private static extern int StrCmpLogicalW(string psz1, string psz2);
 }

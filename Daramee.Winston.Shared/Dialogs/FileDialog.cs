@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using static Daramee.Winston.WinstonInterop;
 
 namespace Daramee.Winston.Dialogs;
 
+[SupportedOSPlatform("windows")]
 public abstract class FileDialog : IDisposable
 {
     public virtual string Title { get; set; } = string.Empty;

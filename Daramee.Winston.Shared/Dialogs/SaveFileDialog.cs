@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Runtime.Versioning;
 using static Daramee.Winston.WinstonInterop;
 
 namespace Daramee.Winston.Dialogs;
 
+[SupportedOSPlatform("windows")]
 public class SaveFileDialog : FileDialog
 {
     internal override IFileDialog CreateFileDialog()
